@@ -54,7 +54,17 @@ before_script:
   - git submodule update --init rsx_program_decompiler asmjit 3rdparty/ffmpeg 3rdparty/pugixml 3rdparty/GSL 3rdparty/libpng Utilities/yaml-cpp 3rdparty/cereal
   - mkdir build
   - cd build
-  - cmake ..
+  - # AppImage generation; feel free to put into an if clause and special branch like below  
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+  - make -j 3
+  - make DESTDIR=appdir install ; find appdir/
+  - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" 
+  - chmod a+x linuxdeployqt*.AppImage
+  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+  - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+  - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -appimage
+  - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+  - curl --upload-file ./RPCS3*.AppImage https://transfer.sh/RPCS3-git.$(git rev-parse --short HEAD)-x86_64.AppImage
 
 script:
   # Add a command to show all the variables. May be useful for debugging Travis.
