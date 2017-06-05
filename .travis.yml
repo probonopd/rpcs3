@@ -70,6 +70,7 @@ before_script:
       chmod a+x linuxdeployqt*.AppImage ;
       unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH ;
       ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs ;
+      cp /usr/lib/x86_64-linux-gnu/libLLVM* ./appdir/usr/lib # Most likely this is too much
       ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -appimage ;
       find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq ;
       zip -r9 rpcs3.zip ./RPCS3*.AppImage; 
